@@ -26,7 +26,7 @@ const Example = () => {
     setInterim('');
   };
 
-  const onResult = (_, finalTranscript, interimTranscript) => {
+  const onChanged = (finalTranscript, interimTranscript) => {
     setInterim(interimTranscript);
     setFinal(prevState => `${prevState}${finalTranscript}`);
   };
@@ -42,7 +42,7 @@ const Example = () => {
   };
 
   const { listen, listening, stop, supported } = useSpeechRecognition({
-    onResult,
+    onChanged,
     onEnd,
     onError,
   });

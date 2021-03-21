@@ -30,30 +30,40 @@ const useEventCallback = (fn, dependencies) => {
 };
 
 const useSpeechRecognition = (props = {}) => {
-  const { onEnd = () => {}, onResult = () => {}, onError = () => {} } = props;
+  const {
+    onEnd = () => {},
+    onResult = () => {},
+    onChanged = () => {},
+    onError = () => {},
+  } = props;
   const recognition = useRef(null);
   const [listening, setListening] = useState(false);
   const [supported, setSupported] = useState(false);
 
-  const processResult = (event) => {
-    const merge = (arr) => (
-      arr.map((result) => result[0])
-        .map((result) => result.transcript)
-        .join('')
-    );
+  const merge = (arr) => (
+    arr.map((result) => result[0])
+      .map((result) => result.transcript)
+      .join('')
+  );
 
-    const results = Array.from(event.results);
-    const changed = results.splice(event.resultIndex)
+  const processResult = (results) => {
+    // console.log('results', results);
+    onResult(merge(results));
+  };
 
-    const transcript = merge(results);
-    const final = merge(
+  const processChanged = (changed) => {
+    onChanged(merge(
       changed.filter((result) => result.isFinal)
-    );
-    const interim = merge(
+    ), merge(
       changed.filter((result) => !result.isFinal)
-    );
+    ));
+  };
 
-    onResult(transcript, final, interim);
+  const handleResult = (event) => {
+    const results = Array.from(event.results);
+    console.log('results', results);
+    processResult(results);
+    processChanged(results.splice(event.resultIndex));
   };
 
   const handleError = (event) => {
@@ -77,7 +87,7 @@ const useSpeechRecognition = (props = {}) => {
     setListening(true);
     recognition.current.lang = lang;
     recognition.current.interimResults = interimResults;
-    recognition.current.onresult = processResult;
+    recognition.current.onresult = handleResult;
     recognition.current.onerror = handleError;
     recognition.current.continuous = continuous;
     recognition.current.maxAlternatives = maxAlternatives;
