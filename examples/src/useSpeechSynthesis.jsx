@@ -10,7 +10,7 @@ const Example = () => {
   const onEnd = () => {
     // You could do something here after speaking has finished
   };
-  const { speak, cancel, speaking, supported, voices } = useSpeechSynthesis({
+  const { speak, cancel, pause, resume, speaking, supported, voices, playStatus, } = useSpeechSynthesis({
     onEnd,
   });
 
@@ -111,6 +111,20 @@ const Example = () => {
                 Speak
               </button>
             )}
+            <button
+							type="button"
+							onClick={pause}
+							disabled={!speaking || playStatus === 'paused'}
+						>
+							Pause
+						</button>
+						<button
+							type="button"
+							onClick={resume}
+							disabled={!speaking || playStatus !== 'paused'}
+						>
+							Resume
+						</button>
           </React.Fragment>
         )}
       </form>
